@@ -51,10 +51,10 @@
       <span class="dock-label" id="music-text">เพลง</span>
     </button>
 
-    <!-- Customize Name / Greeting -->
-    <button id="btn-name-modal" class="dock-btn dock-btn-item" title="ใส่ชื่อตัวเองในการ์ดอวยพร">
-      <span class="dock-icon">✍️</span>
-      <span class="dock-label">ใส่ชื่อ</span>
+    <!-- Customize Name on Tree -->
+    <button id="btn-name-modal" class="dock-btn dock-btn-item" title="ปักชื่อบนต้นคริสต์มาส">
+      <span class="dock-icon">🏷️</span>
+      <span class="dock-label">ชื่อบนต้นไม้</span>
     </button>
 
     <!-- QR Code Share Button -->
@@ -125,31 +125,36 @@
     </div>
   </div>
 
-  <!-- Greeting Card & Custom Name Modal -->
+  <!-- Put Name Directly on Christmas Tree Modal -->
   <div class="modal-backdrop" id="name-modal">
-    <div class="modal-card">
+    <div class="modal-card name-on-tree-card">
       <button class="modal-close-btn" id="modal-close-btn">&times;</button>
-      <div class="modal-badge">✨ Festive Greeting Card ✨</div>
-      <h2 class="modal-title">ใส่ชื่อของคุณเพื่อรับคำอวยพร</h2>
-      <p class="modal-desc">พิมพ์ชื่อเพื่อสร้างการ์ดอวยพรคริสต์มาสแบบ ASCII พร้อมชื่อของคุณบนต้นคริสต์มาสสุดพิเศษ</p>
+      <div class="modal-badge">🎄 Name on Tree • ปักชื่อบนต้นไม้ 🏷️</div>
+      <h2 class="modal-title">พิมพ์ชื่อเพื่อติดบนต้นคริสต์มาส</h2>
+      <p class="modal-desc">ชื่อของคุณจะกลายเป็นป้ายไฟอักษรเรืองแสง หมุนไปพร้อมกับต้นคริสต์มาส 3 มิติทันที ✨</p>
       
       <div class="input-group">
-        <input type="text" id="user-name-input" placeholder="พิมพ์ชื่อของคุณที่นี่... (เช่น Airin)" maxlength="30" autofocus>
-        <button id="btn-save-name" class="btn btn-attack">ยืนยันชื่อ ✨</button>
+        <input type="text" id="user-name-input" placeholder="พิมพ์ชื่อของคุณ (เช่น Airin)" maxlength="16" autofocus>
+        <button id="btn-save-name" class="btn btn-attack">ปักชื่อบนต้นไม้ ✨</button>
       </div>
 
-      <div class="avatar-upload-section">
-        <label for="avatar-file-input" class="avatar-label">
-          <span>🎅 อยากเปลี่ยนหน้าซานต้าบนเลื่อนเป็นรูปคุณ?</span>
-          <span class="upload-link">คลิกเพื่ออัปโหลดรูปภาพ</span>
-        </label>
-        <input type="file" id="avatar-file-input" accept="image/*" style="display:none;">
+      <!-- Quick Preset Suggestions -->
+      <div class="name-presets">
+        <span class="preset-label">ตัวอย่างชื่อ:</span>
+        <button type="button" class="preset-chip" data-name="AIRIN">AIRIN</button>
+        <button type="button" class="preset-chip" data-name="SANTA">SANTA</button>
+        <button type="button" class="preset-chip" data-name="MY LOVE">MY LOVE</button>
+        <button type="button" class="preset-chip" data-name="FAMILY">FAMILY</button>
       </div>
 
-      <!-- Preview of Personalized Banner -->
-      <div class="greeting-preview" id="greeting-preview">
-        <pre id="ascii-banner"></pre>
-        <div id="personalized-message" class="personalized-message"></div>
+      <!-- Live Tree Tag Preview -->
+      <div class="tree-tag-live-preview">
+        <div class="preview-title">ตัวอย่างป้ายไฟบนต้นไม้:</div>
+        <div class="preview-tag-box" id="preview-tag-box">
+          <span class="tag-sparkle">✦</span>
+          <span class="tag-name-text" id="preview-name-text">AIRIN</span>
+          <span class="tag-sparkle">✦</span>
+        </div>
       </div>
     </div>
   </div>

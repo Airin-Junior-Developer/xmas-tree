@@ -844,20 +844,20 @@
   });
 
   // ----------------------------------------------------
-  // 10. Personalized Name & Greeting Card Modal
+  // 10. Put Name Directly on Christmas Tree Modal
   // ----------------------------------------------------
   const nameModal = document.getElementById('name-modal');
   const btnNameModal = document.getElementById('btn-name-modal');
   const modalCloseBtn = document.getElementById('modal-close-btn');
   const userNameInput = document.getElementById('user-name-input');
   const btnSaveName = document.getElementById('btn-save-name');
-  const asciiBanner = document.getElementById('ascii-banner');
-  const personalizedMessage = document.getElementById('personalized-message');
-  const avatarFileInput = document.getElementById('avatar-file-input');
-  const santaFaceImg = document.getElementById('santa-face-img');
+  const previewNameText = document.getElementById('preview-name-text');
 
   btnNameModal.addEventListener('click', () => {
     nameModal.classList.add('active');
+    userNameInput.value = currentTreeName;
+    if (previewNameText) previewNameText.innerText = currentTreeName;
+    rotationAngle = 0; // rotate tree so the plaque faces front!
     setTimeout(() => userNameInput.focus(), 150);
   });
 
@@ -869,53 +869,40 @@
     if (e.target === nameModal) nameModal.classList.remove('active');
   });
 
-  function updateGreeting(name) {
-    const cleanName = (name || 'Airin').trim().toUpperCase();
+  // Real-time live update as the user types
+  userNameInput.addEventListener('input', () => {
+    const val = userNameInput.value.trim().toUpperCase() || 'AIRIN';
+    currentTreeName = val;
+    if (previewNameText) previewNameText.innerText = val;
+    rotationAngle = 0; // keep plaque facing forward while typing
+  });
 
-    const banner = 
-`  __  __                          ____ _          _     _                         
- |  \\/  | ___ _ __ _ __ _   _    / ___| |__  _ __(_)___| |_ _ __ ___   __ _ ___  
- | |\\/| |/ _ \\ '__| '__| | | |  | |   | '_ \\| '__| / __| __| '_ \` _ \\ / _\` / __| 
- | |  | |  __/ |  | |  | |_| |  | |___| | | | |  | \\__ \\ |_| | | | | | (_| \\__ \\ 
- |_|  |_|\\___|_|  |_|   \\__, |   \\____|_| |_|_|  |_|___/\\__|_| |_| |_|\\__,_|___/ 
-                        |___/                                                     
-                 ★ ★ ★ TO: ${cleanName} ★ ★ ★`;
-
-    asciiBanner.innerText = banner;
-    personalizedMessage.innerText = `✨ ขอให้คุณ ${cleanName} มีความสุข สมหวัง และอบอุ่นในเทศกาลคริสต์มาสนี้! 🎄🎁✨`;
-  }
+  // Quick Name Presets
+  const presetChips = document.querySelectorAll('.preset-chip');
+  presetChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const name = chip.getAttribute('data-name');
+      userNameInput.value = name;
+      currentTreeName = name;
+      if (previewNameText) previewNameText.innerText = name;
+      rotationAngle = 0;
+    });
+  });
 
   btnSaveName.addEventListener('click', () => {
     const val = userNameInput.value.trim();
     if (val) {
       currentTreeName = val.toUpperCase();
     }
-    updateGreeting(currentTreeName);
+    if (previewNameText) previewNameText.innerText = currentTreeName;
+    rotationAngle = 0;
     triggerSleighFlight();
-    setTimeout(() => {
-      nameModal.classList.remove('active');
-    }, 1200);
+    nameModal.classList.remove('active');
   });
 
   userNameInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       btnSaveName.click();
-    }
-  });
-
-  // Initial display with default name
-  updateGreeting(currentTreeName);
-
-  avatarFileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        santaFaceImg.src = event.target.result;
-        nameModal.classList.remove('active');
-        triggerSleighFlight();
-      };
-      reader.readAsDataURL(file);
     }
   });
 
