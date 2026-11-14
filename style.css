@@ -626,10 +626,38 @@ html, body {
 }
 
 /* ==========================================
-   Name on Tree Modal Styling
+   Welcome First-Time Name Modal Styling
    ========================================== */
-.name-on-tree-card {
+.welcome-modal-card {
   max-width: 440px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(251, 191, 36, 0.2);
+}
+
+.welcome-modal-card .modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.welcome-modal-card .modal-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cbd5e1;
+  margin-bottom: 20px;
+}
+
+.welcome-modal-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.welcome-modal-card input {
+  text-align: center;
+  font-size: 17px;
+  letter-spacing: 1px;
 }
 
 .name-presets {

@@ -51,12 +51,6 @@
       <span class="dock-label" id="music-text">เพลง</span>
     </button>
 
-    <!-- Customize Name on Tree -->
-    <button id="btn-name-modal" class="dock-btn dock-btn-item" title="ปักชื่อบนต้นคริสต์มาส">
-      <span class="dock-icon">🏷️</span>
-      <span class="dock-label">ชื่อบนต้นไม้</span>
-    </button>
-
     <!-- QR Code Share Button -->
     <button id="btn-qr-modal" class="dock-btn dock-btn-item" title="แชร์ QR Code ให้เพื่อน">
       <span class="dock-icon">📲</span>
@@ -125,36 +119,25 @@
     </div>
   </div>
 
-  <!-- Put Name Directly on Christmas Tree Modal -->
-  <div class="modal-backdrop" id="name-modal">
-    <div class="modal-card name-on-tree-card">
-      <button class="modal-close-btn" id="modal-close-btn">&times;</button>
-      <div class="modal-badge">🎄 Name on Tree • ปักชื่อบนต้นไม้ 🏷️</div>
-      <h2 class="modal-title">พิมพ์ชื่อเพื่อติดบนต้นคริสต์มาส</h2>
-      <p class="modal-desc">ชื่อของคุณจะกลายเป็นป้ายไฟอักษรเรืองแสง หมุนไปพร้อมกับต้นคริสต์มาส 3 มิติทันที ✨</p>
+  <!-- Welcome First-Time Name Prompt Modal (Opens on entry) -->
+  <div class="modal-backdrop active" id="welcome-name-modal">
+    <div class="modal-card welcome-modal-card">
+      <div class="modal-badge">🎄 Welcome to Christmas 2026 ✨</div>
+      <h2 class="modal-title">พิมพ์ชื่อของคุณเพื่อติดบนต้นคริสต์มาส</h2>
+      <p class="modal-desc">ยินดีต้อนรับ! ใส่ชื่อของคุณหรือคนที่คุณรัก แล้วชื่อจะกลายเป็นป้ายไฟเรืองแสง แขวนอยู่บนต้นคริสต์มาส 3 มิตินี้ทันที 🏷️✨</p>
       
-      <div class="input-group">
-        <input type="text" id="user-name-input" placeholder="พิมพ์ชื่อของคุณ (เช่น Airin)" maxlength="16" autofocus>
-        <button id="btn-save-name" class="btn btn-attack">ปักชื่อบนต้นไม้ ✨</button>
-      </div>
+      <form id="welcome-name-form" class="input-group">
+        <input type="text" id="welcome-name-input" placeholder="พิมพ์ชื่อของคุณ (เช่น Airin)" maxlength="16" autofocus required>
+        <button type="submit" id="btn-enter-tree" class="btn btn-attack">เข้าชมต้นคริสต์มาสของฉัน 🎄✨</button>
+      </form>
 
       <!-- Quick Preset Suggestions -->
       <div class="name-presets">
-        <span class="preset-label">ตัวอย่างชื่อ:</span>
+        <span class="preset-label">หรือเลือกชื่อด่วน:</span>
         <button type="button" class="preset-chip" data-name="AIRIN">AIRIN</button>
         <button type="button" class="preset-chip" data-name="SANTA">SANTA</button>
         <button type="button" class="preset-chip" data-name="MY LOVE">MY LOVE</button>
         <button type="button" class="preset-chip" data-name="FAMILY">FAMILY</button>
-      </div>
-
-      <!-- Live Tree Tag Preview -->
-      <div class="tree-tag-live-preview">
-        <div class="preview-title">ตัวอย่างป้ายไฟบนต้นไม้:</div>
-        <div class="preview-tag-box" id="preview-tag-box">
-          <span class="tag-sparkle">✦</span>
-          <span class="tag-name-text" id="preview-name-text">AIRIN</span>
-          <span class="tag-sparkle">✦</span>
-        </div>
       </div>
     </div>
   </div>

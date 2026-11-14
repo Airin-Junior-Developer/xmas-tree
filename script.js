@@ -844,67 +844,68 @@
   });
 
   // ----------------------------------------------------
-  // 10. Put Name Directly on Christmas Tree Modal
+  // 10. Welcome First-Time Name Prompt (On Entry)
   // ----------------------------------------------------
-  const nameModal = document.getElementById('name-modal');
-  const btnNameModal = document.getElementById('btn-name-modal');
-  const modalCloseBtn = document.getElementById('modal-close-btn');
-  const userNameInput = document.getElementById('user-name-input');
-  const btnSaveName = document.getElementById('btn-save-name');
-  const previewNameText = document.getElementById('preview-name-text');
+  const welcomeModal = document.getElementById('welcome-name-modal');
+  const welcomeForm = document.getElementById('welcome-name-form');
+  const welcomeInput = document.getElementById('welcome-name-input');
 
-  btnNameModal.addEventListener('click', () => {
-    nameModal.classList.add('active');
-    userNameInput.value = currentTreeName;
-    if (previewNameText) previewNameText.innerText = currentTreeName;
-    rotationAngle = 0; // rotate tree so the plaque faces front!
-    setTimeout(() => userNameInput.focus(), 150);
-  });
+  // Check URL query param (e.g. ?name=Airin) or localStorage
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramName = urlParams.get('name');
+  const savedName = localStorage.getItem('xmas_name');
 
-  modalCloseBtn.addEventListener('click', () => {
-    nameModal.classList.remove('active');
-  });
+  if (paramName) {
+    currentTreeName = paramName.trim().toUpperCase();
+    if (welcomeInput) welcomeInput.value = currentTreeName;
+  } else if (savedName) {
+    currentTreeName = savedName.trim().toUpperCase();
+    if (welcomeInput) welcomeInput.value = currentTreeName;
+  }
 
-  nameModal.addEventListener('click', (e) => {
-    if (e.target === nameModal) nameModal.classList.remove('active');
-  });
-
-  // Real-time live update as the user types
-  userNameInput.addEventListener('input', () => {
-    const val = userNameInput.value.trim().toUpperCase() || 'AIRIN';
-    currentTreeName = val;
-    if (previewNameText) previewNameText.innerText = val;
-    rotationAngle = 0; // keep plaque facing forward while typing
-  });
-
-  // Quick Name Presets
+  // Preset Chips
   const presetChips = document.querySelectorAll('.preset-chip');
   presetChips.forEach((chip) => {
     chip.addEventListener('click', () => {
       const name = chip.getAttribute('data-name');
-      userNameInput.value = name;
+      if (welcomeInput) welcomeInput.value = name;
       currentTreeName = name;
-      if (previewNameText) previewNameText.innerText = name;
       rotationAngle = 0;
     });
   });
 
-  btnSaveName.addEventListener('click', () => {
-    const val = userNameInput.value.trim();
-    if (val) {
-      currentTreeName = val.toUpperCase();
-    }
-    if (previewNameText) previewNameText.innerText = currentTreeName;
-    rotationAngle = 0;
-    triggerSleighFlight();
-    nameModal.classList.remove('active');
-  });
+  if (welcomeForm) {
+    welcomeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = (welcomeInput ? welcomeInput.value.trim().toUpperCase() : '') || 'AIRIN';
+      currentTreeName = val;
+      localStorage.setItem('xmas_name', currentTreeName);
+      
+      // Close welcome modal
+      if (welcomeModal) welcomeModal.classList.remove('active');
+      
+      // Face front & launch celebratory Santa sleigh flight!
+      rotationAngle = 0;
+      triggerSleighFlight();
 
-  userNameInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      btnSaveName.click();
-    }
-  });
+      // Automatically start Last Christmas music on first user gesture!
+      if (!isPlayingMusic && btnMusic) {
+        btnMusic.click();
+      }
+    });
+  }
+
+  // Allow clicking on top greeting banner to edit name anytime
+  const countdownBadge = document.getElementById('countdown-badge');
+  if (countdownBadge && welcomeModal) {
+    countdownBadge.style.cursor = 'pointer';
+    countdownBadge.title = 'แตะเพื่อเปลี่ยนชื่อบนต้นคริสต์มาส';
+    countdownBadge.addEventListener('click', () => {
+      if (welcomeInput) welcomeInput.value = currentTreeName;
+      welcomeModal.classList.add('active');
+      setTimeout(() => welcomeInput && welcomeInput.focus(), 150);
+    });
+  }
 
   // ----------------------------------------------------
   // 11. QR Code Modal & Link Copy
@@ -918,6 +919,12 @@
 
   if (btnQrModal && qrModal) {
     btnQrModal.addEventListener('click', () => {
+      const baseUrl = 'https://airin-junior-developer.github.io/xmas-tree/';
+      if (shareLinkInput) {
+        shareLinkInput.value = currentTreeName && currentTreeName !== 'AIRIN' 
+          ? `${baseUrl}?name=${encodeURIComponent(currentTreeName)}` 
+          : baseUrl;
+      }
       qrModal.classList.add('active');
     });
 
