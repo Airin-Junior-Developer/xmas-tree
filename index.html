@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎄 Happy Holidays - 3D ASCII Christmas Tree</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Canvas for 3D ASCII Tree & Snow & Santa -->
+  <div class="canvas-container">
+    <canvas id="tree-canvas"></canvas>
+  </div>
+
+  <!-- Top Navigation & Controls Bar -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="brand-line-1">
+        <span class="badge-happy">Happy Christmas</span>
+        <span class="badge-year">2026</span>
+        <span class="badge-icon">🎄</span>
+      </div>
+      <div class="brand-line-2" id="countdown-badge">
+        ✨ ขอให้มีความสุข สุขภาพแข็งแรง และสมหวังทุกประการตลอดเทศกาลแห่งความสุขนี้ 🎁
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <!-- Santa Sleigh Attack Trigger -->
+      <button id="btn-sleigh-attack" class="btn btn-attack" title="ปล่อยซานต้าขี่เลื่อนข้ามจอ!">
+        <span class="btn-icon">🛷</span>
+        <span class="btn-text">จู่โจมขี่เลื่อน</span>
+      </button>
+
+      <!-- Music Toggle -->
+      <button id="btn-music" class="btn btn-secondary" title="เปิด/ปิดเพลง Last Christmas">
+        <span class="btn-icon" id="music-icon">🔇</span>
+        <span class="btn-text" id="music-text">เพลง Last Christmas</span>
+      </button>
+
+      <!-- Customize Name / Greeting -->
+      <button id="btn-name-modal" class="btn btn-secondary" title="ใส่ชื่อตัวเองในการ์ดอวยพร">
+        <span class="btn-icon">✍️</span>
+        <span class="btn-text">ใส่ชื่อตัวเอง</span>
+      </button>
+
+      <!-- Toggle Code Panel -->
+      <button id="btn-toggle-code" class="btn btn-secondary" title="ซ่อน/แสดงหน้าต่างโค้ด">
+        <span class="btn-icon">💻</span>
+        <span class="btn-text">พิมพ์โค้ด</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Live Code Typing Box (Bottom-Left like the Reel) -->
+  <div class="code-box-container" id="code-box">
+    <div class="code-box-header">
+      <div class="window-controls">
+        <span class="dot dot-close" id="btn-close-code"></span>
+        <span class="dot dot-min"></span>
+        <span class="dot dot-max"></span>
+      </div>
+      <div class="code-box-title">
+        <span class="file-icon">⚡</span>
+        <span>xmas-ascii-tree.js</span>
+      </div>
+      <div class="code-box-actions">
+        <span class="status-indicator"></span>
+        <span class="status-text">RUNNING</span>
+      </div>
+    </div>
+    <div class="code-box-body">
+      <pre id="code-content"><code class="language-javascript"></code></pre>
+    </div>
+  </div>
+
+  <!-- Santa Flight Canvas Overlay for Sleigh Animation -->
+  <div id="sleigh-overlay" class="sleigh-overlay">
+    <div id="sleigh-actor" class="sleigh-actor">
+      <!-- Reindeer team + Santa Sleigh in ASCII -->
+      <div class="sleigh-characters" id="sleigh-chars"></div>
+      <div class="santa-avatar-container" id="santa-avatar-container">
+        <img id="santa-face-img" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ffccaa'/><circle cx='38' cy='42' r='5' fill='%23111'/><circle cx='62' cy='42' r='5' fill='%23111'/><circle cx='36' cy='40' r='2' fill='%23fff'/><circle cx='60' cy='40' r='2' fill='%23fff'/><circle cx='50' cy='52' r='6' fill='%23e63946'/><path d='M25,55 Q50,90 75,55 Q50,75 25,55' fill='%23ffffff'/><path d='M20,38 Q50,-10 80,38 Z' fill='%23e63946'/><circle cx='50' cy='6' r='8' fill='%23ffffff'/><rect x='15' y='32' width='70' height='12' rx='6' fill='%23ffffff'/></svg>" alt="Santa Face">
+      </div>
+    </div>
+    <!-- Parachuting / Falling Gifts -->
+    <div id="gift-container" class="gift-container"></div>
+  </div>
+
+  <!-- Greeting Card & Custom Name Modal -->
+  <div class="modal-backdrop" id="name-modal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+      <div class="modal-badge">✨ Festive Greeting Card ✨</div>
+      <h2 class="modal-title">ใส่ชื่อของคุณเพื่อรับคำอวยพร</h2>
+      <p class="modal-desc">พิมพ์ชื่อเพื่อสร้างการ์ดอวยพรคริสต์มาสแบบ ASCII พร้อมชื่อของคุณบนต้นคริสต์มาสสุดพิเศษ</p>
+      
+      <div class="input-group">
+        <input type="text" id="user-name-input" placeholder="พิมพ์ชื่อของคุณที่นี่... (เช่น Airin)" maxlength="30" autofocus>
+        <button id="btn-save-name" class="btn btn-attack">ยืนยันชื่อ ✨</button>
+      </div>
+
+      <div class="avatar-upload-section">
+        <label for="avatar-file-input" class="avatar-label">
+          <span>🎅 อยากเปลี่ยนหน้าซานต้าบนเลื่อนเป็นรูปคุณ?</span>
+          <span class="upload-link">คลิกเพื่ออัปโหลดรูปภาพ</span>
+        </label>
+        <input type="file" id="avatar-file-input" accept="image/*" style="display:none;">
+      </div>
+
+      <!-- Preview of Personalized Banner -->
+      <div class="greeting-preview" id="greeting-preview">
+        <pre id="ascii-banner"></pre>
+        <div id="personalized-message" class="personalized-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Element for Sound FX or Synth Fallback -->
+  <audio id="bgm-audio" loop></audio>
+
+  <!-- Main JavaScript Logic -->
+  <script src="script.js"></script>
+</body>
+</html>

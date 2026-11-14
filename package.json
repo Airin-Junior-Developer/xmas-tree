@@ -1,0 +1,20 @@
+{
+  "name": "happy-xmas-ascii-tree",
+  "version": "1.0.0",
+  "description": "3D Animated ASCII Christmas Tree with Falling Snow, Shiny Ornaments, Live Code Typing, and Santa Sleigh Flight",
+  "main": "tree.js",
+  "scripts": {
+    "start": "node tree.js",
+    "web": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "ascii",
+    "ascii-art",
+    "christmas-tree",
+    "javascript",
+    "creative-coding",
+    "happy-christmas"
+  ],
+  "author": "",
+  "license": "MIT"
+}
