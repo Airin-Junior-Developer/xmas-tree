@@ -59,6 +59,7 @@
   let dragVelocity = 0;
   let isDragging = false;
   let lastTouchX = 0;
+  let currentTreeName = 'AIRIN';
 
   // Pre-generate points for tree foliage, garland, and ornaments
   let treePoints = [];
@@ -440,6 +441,27 @@
       });
     }
 
+    // 6. Name Ribbon Plaque on the Tree
+    if (currentTreeName) {
+      const tagY = -totalHeight * 0.12;
+      const tagRadius = 82 * scaleFactor;
+      const tagX = tagRadius * Math.sin(0);
+      const tagZ = tagRadius * Math.cos(0);
+
+      const xRot = tagX * cosA + tagZ * sinA;
+      const zRot = -tagX * sinA + tagZ * cosA + cameraDistance;
+      const scale = cameraDistance / zRot;
+
+      renderQueue.push({
+        type: 'nametag',
+        x: centerX + xRot * scale,
+        y: centerY + tagY * scale,
+        z: zRot,
+        scale: scale * scaleRatio,
+        name: currentTreeName
+      });
+    }
+
     // Z-Sort (Back to front)
     renderQueue.sort((a, b) => b.z - a.z);
 
@@ -487,6 +509,59 @@
         ctx.shadowBlur = 8;
         ctx.shadowColor = item.color;
         ctx.fillText(item.text, item.x, item.y);
+      } else if (item.type === 'nametag') {
+        const tagText = `★ ${item.name} ★`;
+        const tagFontSize = Math.max(10, Math.floor((isMobile ? 12 : 14) * item.scale));
+        ctx.font = `bold ${tagFontSize}px "Fira Code", monospace`;
+        const textMetrics = ctx.measureText(tagText);
+        const tagW = textMetrics.width + 16 * item.scale;
+        const tagH = tagFontSize * 1.6;
+        const radius = 6 * item.scale;
+
+        ctx.save();
+        ctx.translate(item.x, item.y);
+
+        // Hanging ribbon strings to upper branch
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.75)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(-tagW * 0.35, -tagH * 0.5);
+        ctx.lineTo(-tagW * 0.35, -tagH * 1.15);
+        ctx.moveTo(tagW * 0.35, -tagH * 0.5);
+        ctx.lineTo(tagW * 0.35, -tagH * 1.15);
+        ctx.stroke();
+
+        // Glowing Wooden Ribbon Plaque Background
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = 'rgba(251, 191, 36, 0.75)';
+        const grad = ctx.createLinearGradient(-tagW/2, -tagH/2, tagW/2, tagH/2);
+        grad.addColorStop(0, 'rgba(180, 83, 9, 0.95)');
+        grad.addColorStop(0.5, 'rgba(245, 158, 11, 0.95)');
+        grad.addColorStop(1, 'rgba(146, 64, 14, 0.95)');
+        ctx.fillStyle = grad;
+
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(-tagW / 2, -tagH / 2, tagW, tagH, radius);
+        } else {
+          ctx.rect(-tagW / 2, -tagH / 2, tagW, tagH);
+        }
+        ctx.fill();
+
+        // Golden rim
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+
+        // Sparkling Name Text
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = '#ffffff';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(tagText, 0, 1);
+
+        ctx.restore();
       }
     }
 
@@ -811,12 +886,15 @@
   }
 
   btnSaveName.addEventListener('click', () => {
-    const val = userNameInput.value;
-    updateGreeting(val);
+    const val = userNameInput.value.trim();
+    if (val) {
+      currentTreeName = val.toUpperCase();
+    }
+    updateGreeting(currentTreeName);
     triggerSleighFlight();
     setTimeout(() => {
       nameModal.classList.remove('active');
-    }, 1500);
+    }, 1200);
   });
 
   userNameInput.addEventListener('keydown', (e) => {
@@ -825,7 +903,8 @@
     }
   });
 
-  updateGreeting('YOU');
+  // Initial display with default name
+  updateGreeting(currentTreeName);
 
   avatarFileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];

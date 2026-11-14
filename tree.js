@@ -246,6 +246,32 @@ function renderFrame() {
     if (cx + 1 < WIDTH) buffer[starApexY][cx + 1] = rgb(251, 191, 36, '-');
   }
 
+  // 3D Name Ribbon Plaque attached on the tree
+  if (userName) {
+    const npRadius = 10;
+    const npX = npRadius * Math.sin(0);
+    const npZ = npRadius * Math.cos(0);
+    const npXRot = npX * cosA + npZ * sinA;
+    const npZRot = -npX * sinA + npZ * cosA + cameraDistance;
+    const npScale = cameraDistance / npZRot;
+    const npPx = Math.floor(cx + npXRot * npScale * 2.1);
+    const npPy = Math.floor(cy - 2 * npScale);
+
+    if (npZRot < cameraDistance + 4) {
+      const nameStr = `[★ ${userName} ★]`;
+      const startX = Math.floor(npPx - nameStr.length / 2);
+      for (let c = 0; c < nameStr.length; c++) {
+        const pos = startX + c;
+        if (pos >= 0 && pos < WIDTH && npPy >= 0 && npPy < HEIGHT) {
+          if (npZRot < zBuffer[npPy][pos] + 2) {
+            zBuffer[npPy][pos] = npZRot;
+            buffer[npPy][pos] = rgb(255, 215, 0, BOLD + nameStr[c]);
+          }
+        }
+      }
+    }
+  }
+
   // Santa Flight across sky
   if (isSleighActive) {
     sleighX += 2;
