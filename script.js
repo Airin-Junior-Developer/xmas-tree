@@ -1,5 +1,5 @@
 /* ========================================================
-   🎄 Happy Christmas & Holiday Season - 3D ASCII Tree
+   🎄 Happy Christmas 2026 - Mobile-First 3D ASCII Tree
    Author: Creative Coding / Inspired by JooJhome
    ======================================================== */
 
@@ -14,7 +14,8 @@
 
   let width = (canvas.width = window.innerWidth);
   let height = (canvas.height = window.innerHeight);
-  let dpr = window.devicePixelRatio || 1;
+  // Cap DPR at 2 on mobile to preserve battery & high FPS
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   function resizeCanvas() {
     width = window.innerWidth;
@@ -24,9 +25,9 @@
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
     ctx.scale(dpr, dpr);
+    interfaceTreePoints();
   }
   window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
 
   // ----------------------------------------------------
   // 2. Holiday Blessing & Countdown
@@ -42,7 +43,7 @@
     }
     const diffMs = xmas - now;
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    badge.innerText = `✨ ขอให้มีความสุข สุขภาพแข็งแรง และสมหวังทุกประการตลอดเทศกาลแห่งความสุขนี้ 🎁 (อีก ${days} วันสู่คริสต์มาส)`;
+    badge.innerText = `✨ ขอให้มีความสุข สุขภาพแข็งแรง และสมหวังทุกประการ 🎁 (อีก ${days} วันสู่คริสต์มาส)`;
   }
   updateCountdown();
   setInterval(updateCountdown, 60000);
@@ -52,10 +53,12 @@
   // ----------------------------------------------------
   const TREE_TIERS = 5;
   const NEEDLE_CHARS = ['%', '&', '*', 'x', 's', '#', '@', '+', '^', '.'];
-  const STAR_CHARS = ['★', '*', '✦', '·', '+', 'X'];
 
   let rotationAngle = 0;
   const rotationSpeed = 0.015;
+  let dragVelocity = 0;
+  let isDragging = false;
+  let lastTouchX = 0;
 
   // Pre-generate points for tree foliage, garland, and ornaments
   let treePoints = [];
@@ -63,7 +66,6 @@
   let ornamentPoints = [];
   let trunkPoints = [];
   let giftBoxes = [];
-  interfaceTreePoints();
 
   function interfaceTreePoints() {
     treePoints = [];
@@ -72,45 +74,46 @@
     trunkPoints = [];
     giftBoxes = [];
 
-    const totalHeight = 360;
-    const baseRadius = 145;
+    const isMobile = width < 768;
+    // Scale tree proportionally for small mobile screens
+    const scaleFactor = isMobile ? Math.min(1, Math.max(0.72, width / 420)) : 1;
+    const totalHeight = 350 * scaleFactor;
+    const baseRadius = 140 * scaleFactor;
 
     // Branches & Needles
-    for (let y = 0; y < totalHeight; y += 4.5) {
-      const progress = y / totalHeight; // 0 (top) to 1 (bottom)
-      // Tiered cone profile with gentle flares
-      const tierIndex = Math.floor(progress * TREE_TIERS);
+    const stepY = isMobile ? 5.2 : 4.5;
+    for (let y = 0; y < totalHeight; y += stepY) {
+      const progress = y / totalHeight;
       const tierFraction = (progress * TREE_TIERS) % 1;
       const flare = 0.75 + 0.35 * Math.pow(tierFraction, 1.4);
       const radius = progress * baseRadius * flare;
 
-      const density = Math.floor(12 + progress * 32);
+      const density = Math.floor((isMobile ? 8 : 12) + progress * (isMobile ? 24 : 32));
       for (let i = 0; i < density; i++) {
-        // Spiral and slight random jitter
         const angle = (i / density) * Math.PI * 2 + (y * 0.15) + (Math.random() - 0.5) * 0.2;
-        const r = radius * (0.2 + 0.8 * Math.sqrt(Math.random())); // volume fill
+        const r = radius * (0.2 + 0.8 * Math.sqrt(Math.random()));
         const px = r * Math.cos(angle);
         const pz = r * Math.sin(angle);
-        const py = y - totalHeight * 0.65; // center vertically
+        const py = y - totalHeight * 0.65;
 
         treePoints.push({
           x: px,
           y: py,
           z: pz,
           char: NEEDLE_CHARS[Math.floor(Math.random() * NEEDLE_CHARS.length)],
-          hue: 130 + Math.random() * 35, // greens
+          hue: 130 + Math.random() * 35,
           lightness: 35 + Math.random() * 30,
-          depthScale: 0.8 + Math.random() * 0.4
+          scaleFactor: scaleFactor
         });
       }
     }
 
-    // Spiral Garland (Golden Light Ribbon wrapping around tree)
-    for (let t = 0; t < 1; t += 0.003) {
+    // Spiral Garland
+    const garlandStep = isMobile ? 0.004 : 0.003;
+    for (let t = 0; t < 1; t += garlandStep) {
       const y = t * totalHeight;
-      const progress = t;
-      const radius = progress * baseRadius * 1.02 + 6;
-      const angle = t * Math.PI * 2 * 6.5; // 6.5 spiral turns
+      const radius = t * baseRadius * 1.02 + 5 * scaleFactor;
+      const angle = t * Math.PI * 2 * 6.5;
 
       const px = radius * Math.cos(angle);
       const pz = radius * Math.sin(angle);
@@ -121,25 +124,27 @@
         y: py,
         z: pz,
         t: t,
-        char: t % 0.015 < 0.007 ? 'o' : '*'
+        char: t % 0.015 < 0.007 ? 'o' : '*',
+        scaleFactor: scaleFactor
       });
     }
 
-    // Shiny Bauble Ornaments (Red, Gold, Cyan, Silver)
+    // Shiny Baubles (Ruby, Gold, Cyan, Magenta, Silver)
     const ornamentColors = [
-      { color: '#ef4444', glow: 'rgba(239, 68, 68, 0.8)', name: 'ruby' },
+      { color: '#ef4444', glow: 'rgba(239, 68, 68, 0.85)', name: 'ruby' },
       { color: '#fbbf24', glow: 'rgba(251, 191, 36, 0.85)', name: 'gold' },
-      { color: '#06b6d4', glow: 'rgba(6, 182, 212, 0.8)', name: 'cyan' },
-      { color: '#e879f9', glow: 'rgba(232, 121, 249, 0.8)', name: 'magenta' },
-      { color: '#f8fafc', glow: 'rgba(255, 255, 255, 0.9)', name: 'silver' }
+      { color: '#06b6d4', glow: 'rgba(6, 182, 212, 0.85)', name: 'cyan' },
+      { color: '#e879f9', glow: 'rgba(232, 121, 249, 0.85)', name: 'magenta' },
+      { color: '#f8fafc', glow: 'rgba(255, 255, 255, 0.95)', name: 'silver' }
     ];
 
-    for (let i = 0; i < 48; i++) {
-      const progress = 0.15 + (i / 48) * 0.82;
+    const ornamentCount = isMobile ? 36 : 48;
+    for (let i = 0; i < ornamentCount; i++) {
+      const progress = 0.15 + (i / ornamentCount) * 0.82;
       const tierFraction = (progress * TREE_TIERS) % 1;
       const flare = 0.75 + 0.35 * Math.pow(tierFraction, 1.4);
       const radius = progress * baseRadius * flare * 0.96;
-      const angle = (i * 137.5 * Math.PI) / 180; // Golden ratio angle
+      const angle = (i * 137.5 * Math.PI) / 180;
 
       const px = radius * Math.cos(angle);
       const pz = radius * Math.sin(angle);
@@ -152,64 +157,124 @@
         z: pz,
         style: style,
         phase: Math.random() * Math.PI * 2,
-        speed: 1.5 + Math.random() * 2
+        speed: 1.5 + Math.random() * 2,
+        scaleFactor: scaleFactor
       });
     }
 
     // Wooden Trunk
-    for (let y = totalHeight * 0.35; y < totalHeight * 0.48; y += 6) {
-      for (let angle = 0; angle < Math.PI * 2; angle += 0.5) {
-        const r = 20 * (0.8 + 0.2 * Math.random());
+    for (let y = totalHeight * 0.35; y < totalHeight * 0.48; y += 6 * scaleFactor) {
+      for (let angle = 0; angle < Math.PI * 2; angle += 0.55) {
+        const r = 18 * scaleFactor * (0.8 + 0.2 * Math.random());
         trunkPoints.push({
           x: r * Math.cos(angle),
           y: y,
           z: r * Math.sin(angle),
-          char: ['#', '|', 'H', 'M'][Math.floor(Math.random() * 4)]
+          char: ['#', '|', 'H', 'M'][Math.floor(Math.random() * 4)],
+          scaleFactor: scaleFactor
         });
       }
     }
 
-    // Wrapped Gift Boxes under the tree
+    // Wrapped Gift Boxes
     const giftStyles = [
       { text: '[🎁]', color: '#f43f5e' },
       { text: '[🎀]', color: '#eab308' },
       { text: '[✦]', color: '#3b82f6' },
       { text: '[★]', color: '#10b981' }
     ];
-    for (let g = 0; g < 7; g++) {
-      const dist = 55 + Math.random() * 65;
-      const ang = (g / 7) * Math.PI * 2 + 0.3;
+    for (let g = 0; g < 6; g++) {
+      const dist = (45 + Math.random() * 55) * scaleFactor;
+      const ang = (g / 6) * Math.PI * 2 + 0.3;
       giftBoxes.push({
         x: dist * Math.cos(ang),
         y: totalHeight * 0.46,
         z: dist * Math.sin(ang),
-        style: giftStyles[g % giftStyles.length]
+        style: giftStyles[g % giftStyles.length],
+        scaleFactor: scaleFactor
       });
     }
   }
+  interfaceTreePoints();
 
   // ----------------------------------------------------
-  // 4. Star Particles & Snow Particle System
+  // 4. Touch & Mouse Swipe Gestures (Interactive 3D Spin)
+  // ----------------------------------------------------
+  const touchHint = document.getElementById('touch-hint');
+  function hideTouchHint() {
+    if (touchHint && !touchHint.classList.contains('hidden')) {
+      touchHint.classList.add('hidden');
+    }
+  }
+
+  function handleStart(clientX, target) {
+    if (target.closest('.bottom-action-dock') || 
+        target.closest('.modal-backdrop') || 
+        target.closest('.code-box-container') || 
+        target.closest('.top-bar')) {
+      return;
+    }
+    isDragging = true;
+    lastTouchX = clientX;
+    dragVelocity = 0;
+    hideTouchHint();
+  }
+
+  function handleMove(clientX) {
+    if (!isDragging) return;
+    const deltaX = clientX - lastTouchX;
+    const sensitivity = 0.0075;
+    rotationAngle += deltaX * sensitivity;
+    dragVelocity = deltaX * sensitivity;
+    lastTouchX = clientX;
+  }
+
+  function handleEnd() {
+    isDragging = false;
+  }
+
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 0) handleStart(e.touches[0].clientX, e.target);
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 0) handleMove(e.touches[0].clientX);
+  }, { passive: true });
+
+  window.addEventListener('touchend', handleEnd, { passive: true });
+  window.addEventListener('touchcancel', handleEnd, { passive: true });
+
+  window.addEventListener('mousedown', (e) => {
+    handleStart(e.clientX, e.target);
+  });
+  window.addEventListener('mousemove', (e) => {
+    handleMove(e.clientX);
+  });
+  window.addEventListener('mouseup', handleEnd);
+
+  // Auto-hide touch hint after 6 seconds
+  setTimeout(hideTouchHint, 6000);
+
+  // ----------------------------------------------------
+  // 5. Snow Particle System
   // ----------------------------------------------------
   const snowParticles = [];
-  const SNOW_COUNT = 180;
+  const SNOW_COUNT = width < 768 ? 90 : 160;
 
   for (let i = 0; i < SNOW_COUNT; i++) {
     snowParticles.push({
       x: Math.random() * width,
       y: Math.random() * height,
-      z: 0.5 + Math.random() * 1.5,
-      radius: 1 + Math.random() * 2.5,
       char: ['*', '·', '.', '❄'][Math.floor(Math.random() * 4)],
-      speedY: 0.8 + Math.random() * 1.8,
-      speedX: -0.3 + Math.random() * 0.6,
+      speedY: 0.7 + Math.random() * 1.5,
+      speedX: -0.25 + Math.random() * 0.5,
       sway: Math.random() * Math.PI * 2,
       opacity: 0.3 + Math.random() * 0.7
     });
   }
 
   function updateAndDrawSnow() {
-    ctx.font = '14px "Fira Code", monospace';
+    ctx.font = '13px "Fira Code", monospace';
     for (let s of snowParticles) {
       s.y += s.speedY;
       s.sway += 0.02;
@@ -230,28 +295,28 @@
   }
 
   // Top Radiant Golden Star
-  function drawGoldenStar(cx, cy, time) {
+  function drawGoldenStar(cx, cy, time, scaleRatio) {
     const pulse = 1 + 0.15 * Math.sin(time * 3);
     ctx.save();
     ctx.translate(cx, cy);
 
-    // Glowing rays
-    ctx.shadowBlur = 24 * pulse;
+    ctx.shadowBlur = 20 * pulse;
     ctx.shadowColor = 'rgba(251, 191, 36, 1)';
     ctx.fillStyle = '#fffbeb';
-    ctx.font = `bold ${Math.floor(28 * pulse)}px "Fira Code", monospace`;
+    const starSize = Math.floor((width < 768 ? 24 : 28) * scaleRatio * pulse);
+    ctx.font = `bold ${starSize}px "Fira Code", monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('★', 0, 0);
 
-    // Surrounding sparkling ASCII halo
-    ctx.shadowBlur = 12;
+    // Sparkle halo
+    ctx.shadowBlur = 10;
     ctx.fillStyle = '#fde047';
-    ctx.font = '13px "Fira Code", monospace';
+    ctx.font = `${Math.floor(11 * scaleRatio)}px "Fira Code", monospace`;
     const numSparks = 8;
     for (let i = 0; i < numSparks; i++) {
       const ang = (i / numSparks) * Math.PI * 2 + time * 1.2;
-      const r = (20 + 8 * Math.sin(time * 5 + i)) * pulse;
+      const r = (18 + 7 * Math.sin(time * 5 + i)) * scaleRatio * pulse;
       ctx.fillText('✦', Math.cos(ang) * r, Math.sin(ang) * r);
     }
 
@@ -259,27 +324,31 @@
   }
 
   // ----------------------------------------------------
-  // 5. Main 3D Render Loop
+  // 6. Main 3D Render Loop
   // ----------------------------------------------------
-  let lastTime = 0;
-
   function render(timeMs) {
     const time = timeMs * 0.001;
     ctx.clearRect(0, 0, width, height);
 
-    // Center of tree projection
+    const isMobile = width < 768;
+    const scaleRatio = isMobile ? Math.min(1, Math.max(0.72, width / 420)) : 1;
     const centerX = width * 0.5;
-    const centerY = height * 0.48;
+    // On mobile, center higher to leave comfortable room for bottom dock
+    const centerY = isMobile ? height * 0.44 : height * 0.48;
     const cameraDistance = 450;
 
-    rotationAngle += rotationSpeed;
+    // Apply rotation and inertia drag
+    if (!isDragging) {
+      rotationAngle += rotationSpeed + dragVelocity;
+      dragVelocity *= 0.94; // friction
+    }
+
     const cosA = Math.cos(rotationAngle);
     const sinA = Math.sin(rotationAngle);
 
-    // Snow in background
+    // Background snow
     updateAndDrawSnow();
 
-    // Collect all renderable 3D entities for Z-sorting (painter's algorithm)
     const renderQueue = [];
 
     // 1. Trunk
@@ -292,7 +361,7 @@
         x: centerX + xRot * scale,
         y: centerY + p.y * scale,
         z: zRot,
-        scale: scale,
+        scale: scale * scaleRatio,
         char: p.char
       });
     }
@@ -303,7 +372,6 @@
       const zRot = -p.x * sinA + p.z * cosA + cameraDistance;
       const scale = cameraDistance / zRot;
 
-      // Depth lighting: front points are brighter
       const depthFactor = (cameraDistance + 120 - zRot) / 240;
       const lightness = Math.max(20, Math.min(75, p.lightness + depthFactor * 25));
 
@@ -312,7 +380,7 @@
         x: centerX + xRot * scale,
         y: centerY + p.y * scale,
         z: zRot,
-        scale: scale,
+        scale: scale * scaleRatio,
         char: p.char,
         color: `hsl(${p.hue}, 85%, ${lightness}%)`
       });
@@ -324,7 +392,6 @@
       const zRot = -g.x * sinA + g.z * cosA + cameraDistance;
       const scale = cameraDistance / zRot;
 
-      // Twinkling golden glow
       const twinkle = Math.sin(time * 5 + g.t * 30);
       const isBright = twinkle > 0.2;
 
@@ -333,7 +400,7 @@
         x: centerX + xRot * scale,
         y: centerY + g.y * scale,
         z: zRot,
-        scale: scale,
+        scale: scale * scaleRatio,
         char: g.char,
         isBright: isBright
       });
@@ -350,14 +417,14 @@
         x: centerX + xRot * scale,
         y: centerY + o.y * scale,
         z: zRot,
-        scale: scale,
+        scale: scale * scaleRatio,
         style: o.style,
         phase: o.phase,
         speed: o.speed
       });
     }
 
-    // 5. Gift boxes
+    // 5. Gifts
     for (let box of giftBoxes) {
       const xRot = box.x * cosA + box.z * sinA;
       const zRot = -box.x * sinA + box.z * cosA + cameraDistance;
@@ -367,21 +434,20 @@
         x: centerX + xRot * scale,
         y: centerY + box.y * scale,
         z: zRot,
-        scale: scale,
+        scale: scale * scaleRatio,
         text: box.style.text,
         color: box.style.color
       });
     }
 
-    // Sort far to near (back to front)
+    // Z-Sort (Back to front)
     renderQueue.sort((a, b) => b.z - a.z);
 
-    // Draw all sorted items
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     for (let item of renderQueue) {
-      const fontSize = Math.max(9, Math.floor(13 * item.scale));
+      const fontSize = Math.max(8, Math.floor((isMobile ? 11 : 13) * item.scale));
 
       if (item.type === 'trunk') {
         ctx.font = `${fontSize}px "Fira Code", monospace`;
@@ -391,56 +457,54 @@
       } else if (item.type === 'needle') {
         ctx.font = `${fontSize}px "Fira Code", monospace`;
         ctx.fillStyle = item.color;
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 3;
         ctx.shadowColor = item.color;
         ctx.fillText(item.char, item.x, item.y);
       } else if (item.type === 'garland') {
         ctx.font = `bold ${fontSize + 2}px "Fira Code", monospace`;
         if (item.isBright) {
           ctx.fillStyle = '#ffffff';
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 10;
           ctx.shadowColor = '#fbbf24';
         } else {
           ctx.fillStyle = '#fbbf24';
-          ctx.shadowBlur = 6;
+          ctx.shadowBlur = 5;
           ctx.shadowColor = '#f59e0b';
         }
         ctx.fillText(item.char, item.x, item.y);
       } else if (item.type === 'ornament') {
         const pulse = 1 + 0.25 * Math.sin(time * item.speed + item.phase);
-        const baubleSize = Math.max(12, Math.floor(16 * item.scale * pulse));
+        const baubleSize = Math.max(10, Math.floor((isMobile ? 14 : 16) * item.scale * pulse));
 
         ctx.font = `bold ${baubleSize}px "Fira Code", monospace`;
         ctx.fillStyle = item.style.color;
-        ctx.shadowBlur = 16 * pulse;
+        ctx.shadowBlur = 14 * pulse;
         ctx.shadowColor = item.style.glow;
         ctx.fillText('●', item.x, item.y);
       } else if (item.type === 'gift') {
         ctx.font = `bold ${fontSize + 3}px "Fira Code", monospace`;
         ctx.fillStyle = item.color;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 8;
         ctx.shadowColor = item.color;
         ctx.fillText(item.text, item.x, item.y);
       }
     }
 
-    // Draw Golden Star at tree apex
-    const starApexY = centerY - 360 * 0.65 - 15;
-    drawGoldenStar(centerX, starApexY, time);
+    // Draw Top Golden Star
+    const starApexY = centerY - 350 * scaleRatio * 0.65 - (14 * scaleRatio);
+    drawGoldenStar(centerX, starApexY, time, scaleRatio);
 
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
 
   // ----------------------------------------------------
-  // 6. Wham! "Last Christmas" Web Audio Synthesizer
+  // 7. Wham! "Last Christmas" Web Audio Synthesizer
   // ----------------------------------------------------
   let audioCtx = null;
   let isPlayingMusic = false;
   let musicTimer = null;
 
-  // Melody notes & durations (Last Christmas Chorus)
-  // Frequencies (Hz):
   const NOTES = {
     'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99,
     'G4': 392.00, 'A4': 440.00, 'B4': 493.88, 'C5': 523.25, 'C#5': 554.37,
@@ -448,40 +512,39 @@
     'REST': 0
   };
 
-  // "Last Christmas I gave you my heart, but the very next day you gave it away..."
   const LAST_XMAS_SCORE = [
-    // Last Christmas
     { n: 'D5', d: 0.6 }, { n: 'D5', d: 0.6 }, { n: 'B4', d: 0.8 },
-    // I gave you my heart
     { n: 'D5', d: 0.5 }, { n: 'C#5', d: 0.5 }, { n: 'B4', d: 0.5 }, { n: 'A4', d: 0.9 },
-    // But the very next day
     { n: 'F#4', d: 0.45 }, { n: 'G4', d: 0.45 }, { n: 'A4', d: 0.45 }, { n: 'B4', d: 0.45 }, { n: 'A4', d: 0.8 },
-    // You gave it away
     { n: 'G4', d: 0.5 }, { n: 'F#4', d: 0.5 }, { n: 'E4', d: 0.9 },
-    // This year, to save me from tears
     { n: 'D5', d: 0.5 }, { n: 'D5', d: 0.5 }, { n: 'B4', d: 0.8 },
     { n: 'D5', d: 0.4 }, { n: 'C#5', d: 0.4 }, { n: 'B4', d: 0.4 }, { n: 'A4', d: 0.9 },
-    // I'll give it to someone special
     { n: 'F#4', d: 0.4 }, { n: 'G4', d: 0.4 }, { n: 'A4', d: 0.4 }, { n: 'B4', d: 0.5 }, { n: 'C#5', d: 0.5 }, { n: 'D5', d: 1.2 },
     { n: 'REST', d: 0.6 }
   ];
+
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
 
   function playTone(freq, duration) {
     if (!audioCtx || freq <= 0) return;
     const now = audioCtx.currentTime;
 
-    // Chime / Bell-like synth lead
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(freq, now);
 
-    // Warm envelope
     gain.gain.setValueAtTime(0.001, now);
     gain.gain.linearRampToValueAtTime(0.18, now + 0.05);
     gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-    // Subtle chorus / shimmer oscillator
     const shimmer = audioCtx.createOscillator();
     const shimmerGain = audioCtx.createGain();
     shimmer.type = 'sine';
@@ -519,39 +582,30 @@
   const musicText = document.getElementById('music-text');
 
   btnMusic.addEventListener('click', () => {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
+    initAudio();
     if (isPlayingMusic) {
       isPlayingMusic = false;
       clearTimeout(musicTimer);
       musicIcon.innerText = '🔇';
-      musicText.innerText = 'เพลง Last Christmas';
-      btnMusic.classList.remove('btn-attack');
-      btnMusic.classList.add('btn-secondary');
+      musicText.innerText = 'เพลง';
+      btnMusic.classList.remove('dock-btn-attack');
     } else {
       isPlayingMusic = true;
       startMusicLoop();
       musicIcon.innerText = '🎵';
-      musicText.innerText = 'กำลังเล่น Last Christmas';
-      btnMusic.classList.remove('btn-secondary');
-      btnMusic.classList.add('btn-attack');
+      musicText.innerText = 'เล่นอยู่';
+      btnMusic.classList.add('dock-btn-attack');
     }
   });
 
   // ----------------------------------------------------
-  // 7. "จู่โจมขี่เลื่อน" (Santa Sleigh Attack Flight)
+  // 8. "จู่โจมขี่เลื่อน" (Santa Sleigh Flight Attack)
   // ----------------------------------------------------
   const sleighActor = document.getElementById('sleigh-actor');
   const sleighChars = document.getElementById('sleigh-chars');
   const giftContainer = document.getElementById('gift-container');
   const btnSleighAttack = document.getElementById('btn-sleigh-attack');
 
-  // Multi-line ASCII Reindeer + Sleigh
   const SLEIGH_ASCII = 
 `        __/\\__              __/\\__
    .---'  (oo)         .---'  (oo)      (🔴) RUDOLPH
@@ -568,25 +622,24 @@
   function triggerSleighFlight() {
     if (isSleighFlying) return;
     isSleighFlying = true;
+    initAudio();
 
-    // Jingle sound if audioCtx available
     if (audioCtx) {
       playTone(880, 0.1);
       setTimeout(() => playTone(1046, 0.12), 120);
       setTimeout(() => playTone(1318, 0.18), 240);
     }
 
-    const startX = -600;
-    const targetX = window.innerWidth + 400;
-    const duration = 5500; // ms
+    const startX = -450;
+    const targetX = window.innerWidth + 350;
+    const duration = 5200;
     const startTime = performance.now();
-    const altitude = window.innerHeight * (0.12 + Math.random() * 0.15);
+    const altitude = window.innerHeight * 0.14;
 
-    // Drop gifts periodically during flight
     const dropGiftInterval = setInterval(() => {
       const currentRect = sleighActor.getBoundingClientRect();
-      if (currentRect.left > 50 && currentRect.left < window.innerWidth - 100) {
-        spawnFallingGift(currentRect.left + 80, currentRect.top + 40);
+      if (currentRect.left > 30 && currentRect.left < window.innerWidth - 60) {
+        spawnFallingGift(currentRect.left + 60, currentRect.top + 30);
       }
     }, 450);
 
@@ -594,9 +647,8 @@
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
 
-      // Ease-in-out + wavy flight curve
       const currentX = startX + (targetX - startX) * progress;
-      const currentY = altitude + Math.sin(progress * Math.PI * 4) * 35;
+      const currentY = altitude + Math.sin(progress * Math.PI * 4) * 25;
 
       sleighActor.style.transform = `translate(${currentX}px, ${currentY}px)`;
 
@@ -605,7 +657,7 @@
       } else {
         clearInterval(dropGiftInterval);
         isSleighFlying = false;
-        sleighActor.style.transform = 'translate(-600px, 0px)';
+        sleighActor.style.transform = 'translate(-450px, 0px)';
       }
     }
 
@@ -628,13 +680,13 @@
 
   btnSleighAttack.addEventListener('click', triggerSleighFlight);
 
-  // Auto trigger sleigh occasionally (every 35 seconds)
+  // Auto trigger sleigh occasionally
   setInterval(() => {
     if (!isSleighFlying) triggerSleighFlight();
-  }, 35000);
+  }, 40000);
 
   // ----------------------------------------------------
-  // 8. Live Code Typing Window Simulation ("พิมพ์โค้ด")
+  // 9. Live Code Drawer ("พิมพ์โค้ด")
   // ----------------------------------------------------
   const codeContent = document.getElementById('code-content');
   const codeBox = document.getElementById('code-box');
@@ -643,7 +695,8 @@
 
   const CODE_SNIPPETS = [
     `// 🎄 3D ASCII Christmas Tree Generator\n`,
-    `const totalHeight = 360, baseRadius = 145;\n`,
+    `// Mobile-First Responsive Creative Coding\n`,
+    `const totalHeight = 350, baseRadius = 140;\n`,
     `let rotationAngle = 0;\n\n`,
     `// Math parametric branch spiral\n`,
     `for (let y = 0; y < totalHeight; y += 4.5) {\n`,
@@ -653,21 +706,17 @@
     `  const angle = (y * 0.15) + Math.cos(rotationAngle);\n`,
     `  const x = r * Math.cos(angle);\n`,
     `  const z = r * Math.sin(angle);\n`,
-    `  // Draw needle with emerald green bloom\n`,
     `  drawNeedle(x, y, z, '%', '#10b981');\n`,
     `}\n\n`,
-    `// Ornaments: shiny bauble balls in ruby red, gold and cyan\n`,
+    `// Ornaments: shiny bauble balls\n`,
     `const ornaments = [\n`,
-    `  { color: '#ef4444', glow: 'rgba(239, 68, 68, 0.8)' }, // Ruby\n`,
-    `  { color: '#fbbf24', glow: 'rgba(251, 191, 36, 0.8)' }, // Gold\n`,
-    `  { color: '#06b6d4', glow: 'rgba(6, 182, 212, 0.8)' }  // Cyan\n`,
+    `  { color: '#ef4444', glow: 'ruby' },\n`,
+    `  { color: '#fbbf24', glow: 'gold' },\n`,
+    `  { color: '#06b6d4', glow: 'cyan' }\n`,
     `];\n`,
     `renderOrnaments(ornaments, Math.sin(Date.now() * 0.003));\n\n`,
-    `// จู่โจมขี่เลื่อน: Santa sleigh flight attack\n`,
-    `function launchSleighAttack() {\n`,
-    `  const Rudolph = { nose: '#ff0033', glow: true };\n`,
-    `  dropGiftsAcrossSky(Rudolph, 'Merry Christmas!');\n`,
-    `}\n`
+    `// จู่โจมขี่เลื่อน: Santa sleigh attack flight\n`,
+    `launchSleighAttack(Rudolph, 'Merry Christmas!');\n`
   ];
 
   let snippetIndex = 0;
@@ -686,7 +735,6 @@
 
   function typeCode() {
     if (snippetIndex >= CODE_SNIPPETS.length) {
-      // Loop over
       snippetIndex = 0;
       charIndex = 0;
       currentRawCode = '';
@@ -708,7 +756,6 @@
   }
   typeCode();
 
-  // Toggle / Window Controls
   btnToggleCode.addEventListener('click', () => {
     codeBox.classList.toggle('closed');
   });
@@ -722,7 +769,7 @@
   });
 
   // ----------------------------------------------------
-  // 9. Personalized Name & Greeting Card Modal
+  // 10. Personalized Name & Greeting Card Modal
   // ----------------------------------------------------
   const nameModal = document.getElementById('name-modal');
   const btnNameModal = document.getElementById('btn-name-modal');
@@ -736,7 +783,7 @@
 
   btnNameModal.addEventListener('click', () => {
     nameModal.classList.add('active');
-    userNameInput.focus();
+    setTimeout(() => userNameInput.focus(), 150);
   });
 
   modalCloseBtn.addEventListener('click', () => {
@@ -750,7 +797,6 @@
   function updateGreeting(name) {
     const cleanName = (name || 'Airin').trim().toUpperCase();
 
-    // ASCII Art banner generator
     const banner = 
 `  __  __                          ____ _          _     _                         
  |  \\/  | ___ _ __ _ __ _   _    / ___| |__  _ __(_)___| |_ _ __ ___   __ _ ___  
@@ -779,10 +825,8 @@
     }
   });
 
-  // Default initial greeting
   updateGreeting('YOU');
 
-  // Avatar Upload for Santa
   avatarFileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -797,7 +841,7 @@
   });
 
   // ----------------------------------------------------
-  // 10. QR Code Modal & Link Copy
+  // 11. QR Code Modal & Link Copy
   // ----------------------------------------------------
   const qrModal = document.getElementById('qr-modal');
   const btnQrModal = document.getElementById('btn-qr-modal');
@@ -840,7 +884,7 @@
     }
   }
 
-  // Keyboard Shortcuts: 's' for sleigh, 'm' for music, 'c' for code
+  // Keyboard Shortcuts for Desktop: 's' for sleigh, 'm' for music, 'c' for code
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
     if (e.key.toLowerCase() === 's') {

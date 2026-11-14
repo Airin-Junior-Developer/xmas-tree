@@ -2,12 +2,15 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#07090e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>🎄 Happy Holidays - 3D ASCII Christmas Tree</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Canvas for 3D ASCII Tree & Snow & Santa -->
@@ -15,7 +18,12 @@
     <canvas id="tree-canvas"></canvas>
   </div>
 
-  <!-- Top Navigation & Controls Bar -->
+  <!-- Touch Gesture Guidance Hint -->
+  <div class="touch-hint" id="touch-hint">
+    <span>👆 ปัดหน้าจอเพื่อหมุนต้นไม้ 3D</span>
+  </div>
+
+  <!-- Top Navigation & Branding Bar -->
   <header class="top-bar">
     <div class="brand-group">
       <div class="brand-line-1">
@@ -27,42 +35,43 @@
         ✨ ขอให้มีความสุข สุขภาพแข็งแรง และสมหวังทุกประการตลอดเทศกาลแห่งความสุขนี้ 🎁
       </div>
     </div>
-
-    <div class="action-buttons">
-      <!-- Santa Sleigh Attack Trigger -->
-      <button id="btn-sleigh-attack" class="btn btn-attack" title="ปล่อยซานต้าขี่เลื่อนข้ามจอ!">
-        <span class="btn-icon">🛷</span>
-        <span class="btn-text">จู่โจมขี่เลื่อน</span>
-      </button>
-
-      <!-- QR Code Share Button -->
-      <button id="btn-qr-modal" class="btn btn-secondary" title="แสดง QR Code สำหรับแชร์ให้เพื่อน">
-        <span class="btn-icon">📲</span>
-        <span class="btn-text">QR Code แชร์ให้เพื่อน</span>
-      </button>
-
-      <!-- Music Toggle -->
-      <button id="btn-music" class="btn btn-secondary" title="เปิด/ปิดเพลง Last Christmas">
-        <span class="btn-icon" id="music-icon">🔇</span>
-        <span class="btn-text" id="music-text">เพลง Last Christmas</span>
-      </button>
-
-      <!-- Customize Name / Greeting -->
-      <button id="btn-name-modal" class="btn btn-secondary" title="ใส่ชื่อตัวเองในการ์ดอวยพร">
-        <span class="btn-icon">✍️</span>
-        <span class="btn-text">ใส่ชื่อตัวเอง</span>
-      </button>
-
-      <!-- Toggle Code Panel -->
-      <button id="btn-toggle-code" class="btn btn-secondary" title="ซ่อน/แสดงหน้าต่างโค้ด">
-        <span class="btn-icon">💻</span>
-        <span class="btn-text">พิมพ์โค้ด</span>
-      </button>
-    </div>
   </header>
 
-  <!-- Live Code Typing Box (Bottom-Left like the Reel) -->
-  <div class="code-box-container" id="code-box">
+  <!-- Mobile-First Bottom Floating Action Dock -->
+  <nav class="bottom-action-dock" aria-label="Action controls">
+    <!-- Hero Button: Sleigh Attack -->
+    <button id="btn-sleigh-attack" class="dock-btn dock-btn-attack" title="ปล่อยซานต้าขี่เลื่อนข้ามจอ!">
+      <span class="dock-icon">🛷</span>
+      <span class="dock-label">จู่โจมขี่เลื่อน</span>
+    </button>
+
+    <!-- Music Toggle -->
+    <button id="btn-music" class="dock-btn dock-btn-item" title="เปิด/ปิดเพลง Last Christmas">
+      <span class="dock-icon" id="music-icon">🔇</span>
+      <span class="dock-label" id="music-text">เพลง</span>
+    </button>
+
+    <!-- Customize Name / Greeting -->
+    <button id="btn-name-modal" class="dock-btn dock-btn-item" title="ใส่ชื่อตัวเองในการ์ดอวยพร">
+      <span class="dock-icon">✍️</span>
+      <span class="dock-label">ใส่ชื่อ</span>
+    </button>
+
+    <!-- QR Code Share Button -->
+    <button id="btn-qr-modal" class="dock-btn dock-btn-item" title="แชร์ QR Code ให้เพื่อน">
+      <span class="dock-icon">📲</span>
+      <span class="dock-label">แชร์</span>
+    </button>
+
+    <!-- Toggle Code Panel -->
+    <button id="btn-toggle-code" class="dock-btn dock-btn-item" title="ซ่อน/แสดงหน้าต่างโค้ด">
+      <span class="dock-icon">💻</span>
+      <span class="dock-label">โค้ด</span>
+    </button>
+  </nav>
+
+  <!-- Live Code Drawer (Bottom sheet on mobile, floating card on desktop) -->
+  <div class="code-box-container closed" id="code-box">
     <div class="code-box-header">
       <div class="window-controls">
         <span class="dot dot-close" id="btn-close-code"></span>

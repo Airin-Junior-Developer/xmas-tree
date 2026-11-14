@@ -1,5 +1,5 @@
 /* ========================================================
-   🎄 Happy Christmas 2026 - Stylesheet
+   🎄 Happy Christmas 2026 - Mobile-First Stylesheet
    Dark Night, Glowing Neon Bloom, Retro ASCII Vibes
    ======================================================== */
 
@@ -12,11 +12,16 @@
   --accent-cyan: #06b6d4;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --glass-bg: rgba(15, 23, 42, 0.75);
+  --glass-bg: rgba(15, 23, 42, 0.82);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   --font-mono: 'Fira Code', 'SF Mono', Monaco, 'Courier New', Courier, monospace;
   --font-thai: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 * {
@@ -24,16 +29,19 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
   width: 100%;
   height: 100%;
+  position: fixed; /* prevent rubber-band bounce on mobile */
   overflow: hidden;
   background-color: var(--bg-color);
   color: var(--text-main);
   font-family: var(--font-thai);
   user-select: none;
+  touch-action: none; /* smooth custom touch gestures */
 }
 
 /* ==========================================
@@ -46,7 +54,7 @@ html, body {
   width: 100%;
   height: 100%;
   z-index: 1;
-  background: radial-gradient(circle at 50% 35%, #111a2e 0%, #07090e 75%, #020305 100%);
+  background: radial-gradient(circle at 50% 38%, #111a2e 0%, #07090e 75%, #020305 100%);
 }
 
 #tree-canvas {
@@ -56,38 +64,73 @@ html, body {
 }
 
 /* ==========================================
-   Top Navigation Bar
+   Touch Gesture Guidance Hint
+   ========================================== */
+.touch-hint {
+  position: absolute;
+  top: calc(110px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 14px;
+  border-radius: 9999px;
+  font-size: 11px;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  animation: float-hint 3s ease-in-out infinite;
+}
+
+.touch-hint.hidden {
+  opacity: 0;
+  transform: translate(-50%, -10px);
+}
+
+@keyframes float-hint {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
+}
+
+/* ==========================================
+   Top Navigation & Branding Bar (Mobile-First)
    ========================================== */
 .top-bar {
   position: absolute;
-  top: 16px;
-  left: 20px;
-  right: 20px;
+  top: calc(10px + var(--safe-top));
+  left: calc(14px + var(--safe-left));
+  right: calc(14px + var(--safe-right));
   z-index: 10;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  pointer-events: none; /* children enable pointer-events */
+  pointer-events: none;
+  gap: 5px;
 }
 
 .brand-group {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: center;
+  gap: 4px;
   pointer-events: auto;
+  text-align: center;
 }
 
 .brand-line-1 {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   background: rgba(10, 15, 25, 0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(251, 191, 36, 0.35);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(251, 191, 36, 0.4);
   border-radius: 9999px;
-  padding: 4px 14px;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
-  gap: 8px;
+  padding: 3px 12px;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.2);
+  gap: 6px;
 }
 
 .badge-happy {
@@ -96,144 +139,173 @@ html, body {
   font-size: 13px;
   letter-spacing: 0.5px;
   color: #fbbf24;
-  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
 }
 
 .badge-year {
   font-family: var(--font-mono);
   font-weight: 800;
-  font-size: 11px;
+  font-size: 10px;
   background: linear-gradient(135deg, #ef4444, #f59e0b);
   color: #fff;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 9999px;
   letter-spacing: 1px;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
 }
 
 .badge-icon {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .brand-line-2 {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 400;
-  color: #e2e8f0;
+  color: #cbd5e1;
   background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
-  padding: 5px 14px;
+  padding: 4px 12px;
   border-radius: 9999px;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  max-width: 92vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.action-buttons {
+/* ==========================================
+   Mobile-First Bottom Floating Action Dock
+   ========================================== */
+.bottom-action-dock {
+  position: fixed;
+  bottom: calc(12px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  background: rgba(10, 15, 28, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  padding: 5px 8px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(251, 191, 36, 0.15);
+  max-width: calc(100vw - 20px);
+  width: max-content;
   pointer-events: auto;
 }
 
-/* Buttons */
-.btn {
-  display: inline-flex;
+.dock-btn {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 7px;
-  font-family: var(--font-thai);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 10px;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 9999px;
   border: 1px solid transparent;
+  background: transparent;
+  color: #e2e8f0;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
+  touch-action: manipulation;
 }
 
-.btn:active {
-  transform: scale(0.96);
+.dock-btn:active {
+  transform: scale(0.92);
 }
 
-.btn-secondary {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(12px);
-  border-color: var(--glass-border);
-  color: #f1f5f9;
+.dock-icon {
+  font-size: 18px;
+  line-height: 1;
 }
 
-.btn-secondary:hover {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+.dock-label {
+  font-family: var(--font-thai);
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: 3px;
+  white-space: nowrap;
 }
 
-.btn-attack {
+/* Attack Hero Button */
+.dock-btn-attack {
   background: linear-gradient(135deg, #dc2626, #ea580c);
   color: #ffffff;
-  border-color: rgba(254, 202, 202, 0.3);
-  font-weight: 600;
+  padding: 6px 14px;
+  box-shadow: 0 0 16px rgba(220, 38, 38, 0.5);
   animation: pulse-glow 2.5s infinite;
 }
 
-.btn-attack:hover {
-  background: linear-gradient(135deg, #ef4444, #f97316);
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+.dock-btn-attack .dock-label {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.dock-btn-attack:active {
+  transform: scale(0.94);
+}
+
+.dock-btn-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+    box-shadow: 0 0 14px rgba(220, 38, 38, 0.4);
   }
   50% {
-    box-shadow: 0 0 30px rgba(249, 115, 22, 0.8);
+    box-shadow: 0 0 26px rgba(249, 115, 22, 0.8);
   }
 }
 
 /* ==========================================
-   Live Code Typing Box (Bottom-Left)
+   Live Code Drawer (Mobile Bottom Sheet / Desktop Box)
    ========================================== */
 .code-box-container {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  width: 440px;
-  max-width: calc(100vw - 48px);
-  height: 250px;
-  z-index: 10;
-  background: rgba(11, 15, 25, 0.88);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 12px;
-  box-shadow: var(--glass-shadow), 0 0 25px rgba(0, 0, 0, 0.6);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 52vh;
+  z-index: 25;
+  background: rgba(11, 15, 25, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.code-box-container.minimized {
-  height: 42px;
-  width: 240px;
-  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  transform: translateY(0);
 }
 
 .code-box-container.closed {
-  opacity: 0;
-  transform: translateY(20px) scale(0.95);
+  transform: translateY(105%);
   pointer-events: none;
 }
 
+.code-box-container.minimized {
+  height: 44px;
+}
+
 .code-box-header {
-  height: 38px;
+  height: 42px;
   background: rgba(15, 23, 42, 0.95);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
+  padding: 0 14px;
+  cursor: pointer;
 }
 
 .window-controls {
@@ -242,8 +314,8 @@ html, body {
 }
 
 .dot {
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   cursor: pointer;
   display: inline-block;
@@ -252,10 +324,6 @@ html, body {
 .dot-close { background-color: #ff5f56; }
 .dot-min { background-color: #ffbd2e; }
 .dot-max { background-color: #27c93f; }
-
-.dot:hover {
-  filter: brightness(1.2);
-}
 
 .code-box-title {
   font-family: var(--font-mono);
@@ -296,7 +364,7 @@ html, body {
 
 .code-box-body {
   flex: 1;
-  padding: 12px 14px;
+  padding: 12px 16px calc(14px + var(--safe-bottom));
   overflow-y: auto;
   font-family: var(--font-mono);
   font-size: 12px;
@@ -351,7 +419,7 @@ html, body {
 .sleigh-actor {
   position: absolute;
   top: 14%;
-  left: -480px; /* starts off-screen */
+  left: -480px;
   display: flex;
   align-items: center;
   transition: none;
@@ -360,7 +428,7 @@ html, body {
 
 .sleigh-characters {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 11px;
   line-height: 1.1;
   white-space: pre;
   color: #f8fafc;
@@ -369,10 +437,10 @@ html, body {
 
 .santa-avatar-container {
   position: absolute;
-  top: 12px;
-  left: 45px;
-  width: 38px;
-  height: 38px;
+  top: 10px;
+  left: 38px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #ef4444;
@@ -398,7 +466,7 @@ html, body {
 
 .falling-gift {
   position: absolute;
-  font-size: 24px;
+  font-size: 22px;
   animation: gift-drop linear forwards;
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
 }
@@ -418,7 +486,7 @@ html, body {
 }
 
 /* ==========================================
-   Greeting Card & Name Modal
+   Modals (Mobile-First Sheet / Centered Card)
    ========================================== */
 .modal-backdrop {
   position: fixed;
@@ -428,6 +496,7 @@ html, body {
   height: 100%;
   background: rgba(2, 6, 23, 0.85);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 50;
   display: flex;
   justify-content: center;
@@ -435,7 +504,7 @@ html, body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
-  padding: 20px;
+  padding: 16px;
 }
 
 .modal-backdrop.active {
@@ -445,16 +514,19 @@ html, body {
 
 .modal-card {
   position: relative;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(24, 34, 53, 0.98));
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 20px;
-  width: 600px;
-  max-width: 100%;
-  padding: 32px;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.25);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px 20px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.2);
   transform: translateY(20px) scale(0.96);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: center;
+  scrollbar-width: thin;
 }
 
 .modal-backdrop.active .modal-card {
@@ -463,62 +535,70 @@ html, body {
 
 .modal-close-btn {
   position: absolute;
-  top: 18px;
-  right: 20px;
-  background: none;
+  top: 14px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.08);
   border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   color: var(--text-muted);
-  font-size: 26px;
+  font-size: 22px;
   cursor: pointer;
   line-height: 1;
-  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
   color: #fff;
 }
 
 .modal-badge {
   display: inline-block;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--accent-gold);
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.3);
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 9999px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .modal-title {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .modal-desc {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 24px;
-  line-height: 1.5;
+  margin-bottom: 18px;
+  line-height: 1.45;
 }
 
 .input-group {
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .input-group input {
-  flex: 1;
+  width: 100%;
   background: rgba(2, 6, 23, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 12px 16px;
+  border-radius: 12px;
+  padding: 12px 14px;
   color: #fff;
   font-family: var(--font-thai);
-  font-size: 15px;
+  font-size: 16px; /* CRITICAL: 16px prevents iOS Safari from auto-zooming! */
   outline: none;
   transition: border-color 0.2s;
 }
@@ -528,9 +608,26 @@ html, body {
   box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
 }
 
+.btn-attack {
+  background: linear-gradient(135deg, #dc2626, #ea580c);
+  color: #ffffff;
+  border: none;
+  font-family: var(--font-thai);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-attack:active {
+  transform: scale(0.96);
+}
+
 .avatar-upload-section {
-  margin-bottom: 22px;
-  padding: 12px;
+  margin-bottom: 16px;
+  padding: 10px;
   background: rgba(2, 6, 23, 0.4);
   border: 1px dashed rgba(255, 255, 255, 0.18);
   border-radius: 12px;
@@ -540,8 +637,8 @@ html, body {
 .avatar-label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
+  gap: 3px;
+  font-size: 12px;
   color: #cbd5e1;
   cursor: pointer;
 }
@@ -556,14 +653,14 @@ html, body {
   background: #020617;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 16px;
+  padding: 14px;
   margin-top: 10px;
 }
 
 #ascii-banner {
   font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.15;
+  font-size: 8px;
+  line-height: 1.1;
   color: var(--accent-gold);
   text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
   white-space: pre;
@@ -571,8 +668,8 @@ html, body {
 }
 
 .personalized-message {
-  margin-top: 12px;
-  font-size: 16px;
+  margin-top: 10px;
+  font-size: 14px;
   font-weight: 600;
   color: #a7f3d0;
   text-shadow: 0 0 12px rgba(167, 243, 208, 0.6);
@@ -582,46 +679,48 @@ html, body {
    QR Code Share Modal
    ========================================== */
 .qr-modal-card {
-  width: 440px;
+  max-width: 380px;
 }
 
 .qr-image-wrapper {
   background: #ffffff;
-  padding: 16px;
+  padding: 12px;
   border-radius: 16px;
   display: inline-block;
-  margin: 10px auto 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(251, 191, 36, 0.35);
+  margin: 6px auto 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.35);
 }
 
 .qr-image-wrapper img {
-  width: 220px;
-  height: 220px;
+  width: 190px;
+  height: 190px;
   display: block;
 }
 
 .qr-link-box {
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .qr-link-box input {
-  flex: 1;
+  width: 100%;
   background: rgba(2, 6, 23, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   color: #fbbf24;
   font-family: var(--font-mono);
   font-size: 12px;
   outline: none;
+  text-align: center;
 }
 
 .copy-success {
   display: none;
   margin-top: 10px;
-  font-size: 13px;
+  font-size: 12px;
   color: #34d399;
   font-weight: 500;
 }
@@ -631,34 +730,86 @@ html, body {
   animation: fade-in 0.3s ease;
 }
 
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ==========================================
-   Responsive Adaptations
+   Desktop / Tablet Media Query (min-width: 768px)
    ========================================== */
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   .top-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    top: 18px;
+    left: 24px;
+    right: 24px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .brand-group {
-    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
   }
 
-  .action-buttons {
-    flex-wrap: wrap;
-    justify-content: center;
+  .brand-line-1 {
+    font-size: 14px;
+    padding: 4px 14px;
   }
 
-  .code-box-container {
-    width: calc(100vw - 32px);
-    left: 16px;
-    bottom: 16px;
-    height: 180px;
+  .badge-happy {
+    font-size: 14px;
   }
 
   .brand-line-2 {
-    font-size: 11px;
-    padding: 4px 10px;
+    font-size: 12px;
+    padding: 5px 14px;
+    max-width: 600px;
+  }
+
+  .bottom-action-dock {
+    bottom: 24px;
+    gap: 12px;
+    padding: 8px 16px;
+  }
+
+  .dock-btn {
+    padding: 7px 14px;
+  }
+
+  .dock-icon {
+    font-size: 20px;
+  }
+
+  .dock-label {
+    font-size: 12px;
+  }
+
+  .dock-btn-attack {
+    padding: 8px 20px;
+  }
+
+  /* On desktop, code box floats on bottom-left */
+  .code-box-container {
+    bottom: 24px;
+    left: 24px;
+    width: 440px;
+    height: 250px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .input-group {
+    flex-direction: row;
+  }
+
+  .qr-link-box {
+    flex-direction: row;
+  }
+
+  #ascii-banner {
+    font-size: 10px;
   }
 }
