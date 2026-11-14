@@ -579,6 +579,59 @@ html, body {
 }
 
 /* ==========================================
+   QR Code Share Modal
+   ========================================== */
+.qr-modal-card {
+  width: 440px;
+}
+
+.qr-image-wrapper {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 16px;
+  display: inline-block;
+  margin: 10px auto 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(251, 191, 36, 0.35);
+}
+
+.qr-image-wrapper img {
+  width: 220px;
+  height: 220px;
+  display: block;
+}
+
+.qr-link-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.qr-link-box input {
+  flex: 1;
+  background: rgba(2, 6, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #fbbf24;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+}
+
+.copy-success {
+  display: none;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #34d399;
+  font-weight: 500;
+}
+
+.copy-success.show {
+  display: block;
+  animation: fade-in 0.3s ease;
+}
+
+/* ==========================================
    Responsive Adaptations
    ========================================== */
 @media (max-width: 768px) {

@@ -35,6 +35,12 @@
         <span class="btn-text">จู่โจมขี่เลื่อน</span>
       </button>
 
+      <!-- QR Code Share Button -->
+      <button id="btn-qr-modal" class="btn btn-secondary" title="แสดง QR Code สำหรับแชร์ให้เพื่อน">
+        <span class="btn-icon">📲</span>
+        <span class="btn-text">QR Code แชร์ให้เพื่อน</span>
+      </button>
+
       <!-- Music Toggle -->
       <button id="btn-music" class="btn btn-secondary" title="เปิด/ปิดเพลง Last Christmas">
         <span class="btn-icon" id="music-icon">🔇</span>
@@ -88,6 +94,26 @@
     </div>
     <!-- Parachuting / Falling Gifts -->
     <div id="gift-container" class="gift-container"></div>
+  </div>
+
+  <!-- QR Code Share Modal -->
+  <div class="modal-backdrop" id="qr-modal">
+    <div class="modal-card qr-modal-card">
+      <button class="modal-close-btn" id="qr-modal-close">&times;</button>
+      <div class="modal-badge">📲 สแกน QR Code เพื่อเปิดบนมือถือ 🎄</div>
+      <h2 class="modal-title">ส่งต่อความสุขให้เพื่อนสแกน</h2>
+      <p class="modal-desc">เปิดกล้องมือถือแล้วสแกน QR Code ด้านล่างนี้เพื่อเปิดดูต้นคริสต์มาส 3D ได้ทันทีจากทุกที่</p>
+
+      <div class="qr-image-wrapper">
+        <img src="qrcode.png" alt="Scan QR Code to open Xmas Tree" id="qr-code-img">
+      </div>
+
+      <div class="qr-link-box">
+        <input type="text" id="share-link-input" value="https://airin-junior-developer.github.io/xmas-tree/" readonly>
+        <button id="btn-copy-link" class="btn btn-attack">คัดลอกลิงก์ ✨</button>
+      </div>
+      <div id="copy-success-msg" class="copy-success">✓ คัดลอกลิงก์เรียบร้อยแล้ว ส่งให้เพื่อนได้เลย!</div>
+    </div>
   </div>
 
   <!-- Greeting Card & Custom Name Modal -->

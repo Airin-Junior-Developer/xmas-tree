@@ -796,6 +796,50 @@
     }
   });
 
+  // ----------------------------------------------------
+  // 10. QR Code Modal & Link Copy
+  // ----------------------------------------------------
+  const qrModal = document.getElementById('qr-modal');
+  const btnQrModal = document.getElementById('btn-qr-modal');
+  const qrModalClose = document.getElementById('qr-modal-close');
+  const btnCopyLink = document.getElementById('btn-copy-link');
+  const shareLinkInput = document.getElementById('share-link-input');
+  const copySuccessMsg = document.getElementById('copy-success-msg');
+
+  if (btnQrModal && qrModal) {
+    btnQrModal.addEventListener('click', () => {
+      qrModal.classList.add('active');
+    });
+
+    qrModalClose.addEventListener('click', () => {
+      qrModal.classList.remove('active');
+    });
+
+    qrModal.addEventListener('click', (e) => {
+      if (e.target === qrModal) qrModal.classList.remove('active');
+    });
+
+    btnCopyLink.addEventListener('click', () => {
+      shareLinkInput.select();
+      shareLinkInput.setSelectionRange(0, 99999);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+          showCopySuccess();
+        });
+      } else {
+        document.execCommand('copy');
+        showCopySuccess();
+      }
+    });
+
+    function showCopySuccess() {
+      copySuccessMsg.classList.add('show');
+      setTimeout(() => {
+        copySuccessMsg.classList.remove('show');
+      }, 3000);
+    }
+  }
+
   // Keyboard Shortcuts: 's' for sleigh, 'm' for music, 'c' for code
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
